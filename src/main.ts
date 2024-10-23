@@ -9,6 +9,7 @@ initConfig(app);
 initRoutes(app);
 
 const port = env.PORT || 3333;
-const server = app.listen(port, () => {
+
+app.listen(port, () => {
   console.info(`Listening at http://localhost:${port}`);
 });
