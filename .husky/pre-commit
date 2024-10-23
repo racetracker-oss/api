@@ -1,1 +1,1 @@
-echo "test"
+npx biome lint
