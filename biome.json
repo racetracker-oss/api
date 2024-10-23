@@ -23,7 +23,8 @@
 			"recommended": true,
 			"correctness": {
 				"noUnusedImports": "error",
-				"noUnusedFunctionParameters": "error"
+				"noUnusedFunctionParameters": "error",
+				"noUnusedVariables": "error"
 			},
 			"suspicious": {
 				"noExplicitAny": "error"
