@@ -1,0 +1,2 @@
+npm run biome lint
+npm run build
