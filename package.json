@@ -7,7 +7,6 @@
     "dc:db": "docker compose -f docker/docker-compose.dev.yml up -d",
     "dev": "npm run dc:db && nodemon -r tsconfig-paths/register src/main.ts",
     "build": "rimraf ./dist && webpack",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "db:generate": "prisma generate"
   },
   "author": "",
