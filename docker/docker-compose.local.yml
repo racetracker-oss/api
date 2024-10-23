@@ -18,10 +18,8 @@ services:
     image: racetracker-oss/api
     ports:
       - 8080:8080
-    environment:
-      - DATABASE_URL=postgresql://racetracker:r4c3tr4ck3r@database:5432/racetracker?schema=public
-      - ACCESS_TOKEN_SECRET=randomstring
-      - PORT=8080
+    env_file:
+      - ../env
     depends_on:
       - database
     networks:
