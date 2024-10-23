@@ -18,6 +18,7 @@ if (!result.success) {
     .map((error) => `${error.path}: ${error.message}`)
     .join("\n");
   console.error(`Error parsing environment variables: \n${mapError}`);
+  process.exit(1);
 }
 
 export const env = processEnv;
