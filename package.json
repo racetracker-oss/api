@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dc:db": "docker compose -f docker/docker-compose.local.yml up -d",
+    "dc:db": "docker compose -f docker/docker-compose.dev.yml up -d",
     "dev": "npm run dc:db && nodemon -r tsconfig-paths/register src/main.ts",
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
+    "build": "webpack",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "db:generate": "prisma generate"
   },
   "author": "",
   "license": "ISC",
@@ -25,9 +26,13 @@
     "globals": "^15.11.0",
     "nodemon": "^3.1.7",
     "prisma": "^5.21.1",
+    "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1",
@@ -41,6 +46,7 @@
     "morgan": "^1.10.0",
     "passport": "^0.7.0",
     "passport-http-bearer": "^1.0.1",
+    "rimraf": "^6.0.1",
     "tsconfig-paths": "^4.2.0",
     "zod": "^3.23.8"
   }
