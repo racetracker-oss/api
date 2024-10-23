@@ -16,6 +16,7 @@ services:
 
   api:
     image: racetracker-oss/api
+    container_name: racetracker-api
     ports:
       - 8080:8080
     env_file:
