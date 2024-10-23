@@ -1,2 +1,2 @@
-npm run biome lint
+npx biome lint
 npm run build
