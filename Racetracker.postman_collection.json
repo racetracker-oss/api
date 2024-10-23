@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "c6794a28-af4e-4210-b11e-d7f8a4bfacb2",
+		"name": "Racetracker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "19180556"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "admin@racetracker.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "racetracker",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{API_URL}}/auth/sign-in"
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Up",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "admin@racetracker.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "racetracker",
+									"type": "text"
+								},
+								{
+									"key": "confirmPassword",
+									"value": "racetracker",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{API_URL}}/auth/sign-up"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
