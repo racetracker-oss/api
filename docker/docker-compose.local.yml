@@ -8,19 +8,19 @@ services:
     ports:
       - 5432:5432
     env_file:
-      - ../env
+      - ../.env
     networks:
       - racetracker-local
     volumes:
       - database-data:/var/lib/postgresql/data
 
   api:
-    image: racetracker-oss/api
+    image: floriian/racetracker-api:latest
     container_name: racetracker-api
     ports:
       - 8080:8080
     env_file:
-      - ../env
+      - ../.env
     depends_on:
       - database
     networks:
@@ -28,3 +28,6 @@ services:
 
 networks:
   racetracker-local:
+
+volumes:
+  database-data:
