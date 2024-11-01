@@ -6,6 +6,11 @@ declare global {
     interface ProcessEnv extends z.infer<typeof envSchema> {}
   }
   namespace Express {
-    interface User extends JwtPayload {}
+    interface User extends JwtPayload {
+      sub: string;
+    }
   }
 }
+
+// biome-ignore lint/complexity/noUselessEmptyExport: <explanation>
+export {};
