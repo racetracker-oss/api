@@ -11,13 +11,13 @@ export const signIn = async (req: Request, res: Response) => {
   const { body } = req;
   const user = await prisma.user.findFirst({ where: { email: body.email } });
   if (!user) {
-    res.json({ success: false, message: "Invalid credentials. " });
-    return;
+    return res.status(401).json({ success: false, message: "Invalid credentials. " });
   }
 
   const isPasswordCorrect = await argon2.verify(user.password, body.password);
-  if (!isPasswordCorrect)
-    res.json({ success: false, message: "Invalid credentials. " });
+  if (!isPasswordCorrect) {
+    return res.status(401).json({ success: false, message: "Invalid credentials. " });
+  }
 
   const payload: JwtPayload = {
     sub: user.id,
