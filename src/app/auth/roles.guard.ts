@@ -5,7 +5,7 @@ import type { NextFunction, Request, Response } from "express";
 export const rolesGuard =
   (roles: Role[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await prisma.user.findUnique({ where: { id: +req.user.sub } });
+    const user = await prisma.user.findUnique({ where: { id: +req.user.id } });
     if (!user) {
       return res.status(403).send("Forbidden");
     }
