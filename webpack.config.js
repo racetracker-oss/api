@@ -23,10 +23,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
-        use: ["ts-loader"],
+        loader: "ts-loader",
+        options: {
+          configFile: path.resolve(__dirname, "tsconfig.json"),
+        },
       },
     ],
   },
   externals: [webpackNodeExternals()],
+  devtool: "source-map",
 };
