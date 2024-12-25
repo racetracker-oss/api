@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dc:db": "docker compose -f docker/docker-compose.dev.yml up -d",
-    "dev": "npm run dc:db && nodemon -r tsconfig-paths/register src/main.ts",
+    "dev": "NODE_ENV=dev npm run dc:db && npx prisma migrate dev && nodemon -r tsconfig-paths/register src/main.ts",
     "build": "rimraf ./dist && webpack",
     "db:generate": "prisma generate",
     "prepare": "husky"
