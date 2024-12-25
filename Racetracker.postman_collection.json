@@ -16,7 +16,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"const { accessToken, refreshToken } = pm.response.json();",
+									"",
+									"if(accessToken && refreshToken) {",
+									"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken)",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -34,12 +39,12 @@
 							"urlencoded": [
 								{
 									"key": "email",
-									"value": "admin@racetracker.com",
+									"value": "{{admin_email}}",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "racetracker",
+									"value": "{{admin_password}}",
 									"type": "text"
 								}
 							]
@@ -50,6 +55,23 @@
 				},
 				{
 					"name": "Sign Up",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const { accessToken, refreshToken } = pm.response.json();",
+									"",
+									"if(accessToken && refreshToken) {",
+									"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken)",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -61,17 +83,17 @@
 							"urlencoded": [
 								{
 									"key": "email",
-									"value": "admin@racetracker.com",
+									"value": "{{admin_email}}",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "racetracker",
+									"value": "{{admin_password}}",
 									"type": "text"
 								},
 								{
 									"key": "confirmPassword",
-									"value": "racetracker",
+									"value": "{{admin_password}}",
 									"type": "text"
 								}
 							]
@@ -79,8 +101,99 @@
 						"url": "{{API_URL}}/auth/sign-up"
 					},
 					"response": []
+				},
+				{
+					"name": "Me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{API_URL}}/auth/me"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{REFRESH_TOKEN}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"url": "{{API_URL}}/auth/refresh-token"
+					},
+					"response": []
 				}
 			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{ACCESS_TOKEN}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"const apiUrl = pm.environment.get(\"API_URL\");",
+					"const accessToken = pm.environment.get(\"ACCESS_TOKEN\");",
+					"const refreshToken = pm.environment.get(\"REFRESH_TOKEN\");",
+					"",
+					"const sendRequest = (options, callback) => {",
+					"    pm.sendRequest(options, callback);",
+					"};",
+					"",
+					"const handleAuthMeResponse = (err, res) => {",
+					"    console.log(\"auth me response\", res);",
+					"    if (res.code === 401) {",
+					"        const refreshOptions = {",
+					"            url: `${apiUrl}/auth/refresh-token`,",
+					"            method: \"POST\",",
+					"            header: {",
+					"                \"Authorization\": \"Bearer \" + pm.environment.get(\"REFRESH_TOKEN\")",
+					"            }",
+					"        };",
+					"        sendRequest(refreshOptions, handleRefreshTokenResponse);",
+					"    }",
+					"};",
+					"",
+					"const handleRefreshTokenResponse = (err, res) => {",
+					"    const response = res.json();",
+					"",
+					"    if(response) {",
+					"        pm.environment.set(\"ACCESS_TOKEN\", response.accessToken);",
+					"        pm.environment.set(\"REFRESH_TOKEN\", response.refreshToken)",
+					"    }",
+					"};",
+					"",
+					"const authMeOptions = {",
+					"    url: `${apiUrl}/auth/me`,",
+					"    method: \"GET\",",
+					"    header: {",
+					"        Authorization: `Bearer ${accessToken}`,",
+					"    },",
+					"};",
+					"",
+					"sendRequest(authMeOptions, handleAuthMeResponse);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
