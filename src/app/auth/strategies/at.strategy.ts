@@ -1,27 +1,21 @@
 import { Strategy } from "passport-http-bearer";
-import jwt, { JsonWebTokenError, type JwtPayload } from "jsonwebtoken";
-import { prisma } from "@/database";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import { env } from "@/env";
+import passport from "passport";
+import type { NextFunction, Request, Response } from "express";
+import { getUserById } from "@/app/user";
 
-export const atStrategy = new Strategy(async (token: string, done) => {
+const strategy = new Strategy(async (token: string, done) => {
   try {
-    const verifyToken = jwt.verify(
+    const decodedToken = jwt.verify(
       token,
       env.ACCESS_TOKEN_SECRET
     ) as JwtPayload;
-    if (!verifyToken) {
-      return done(null, false, {
-        message: "Invalid access token",
-        scope: "all",
-      });
-    }
 
-    const user = await prisma.user.findFirst({
-      where: { id: +verifyToken.sub },
-    });
+    const user = await getUserById(+decodedToken.sub);
 
     if (!user) {
-      return done(null, false, { message: "User not found", scope: "all" });
+      return done(null, false);
     }
 
     const payloadUser = {
@@ -29,11 +23,29 @@ export const atStrategy = new Strategy(async (token: string, done) => {
       sub: user.id.toString(),
     };
 
-    return done(null, payloadUser);
+    const { password, refreshToken, ...safePayloadUser } = payloadUser;
+
+    return done(null, safePayloadUser);
   } catch (e) {
-    if (e instanceof JsonWebTokenError) {
-      return done(e);
-    }
     return done(e);
   }
 });
+
+export const atStrategy = (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate(strategy, { session: false }, (err, user) => {
+    if (err) {
+      console.log(err);
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    if (!user) {
+      console.log(user);
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    req.user = user;
+    next();
+  })(req, res, next);
+};

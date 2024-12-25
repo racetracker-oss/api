@@ -4,8 +4,10 @@ import argon2 from "argon2";
 import { env } from "@/env";
 import { getUserById } from "@/app/user";
 import { AuthenticationError } from "../errors/authentication.error";
+import passport from "passport";
+import type { NextFunction, Request, Response } from "express";
 
-export const rtStrategy = new Strategy(async (token: string, done) => {
+const strategy = new Strategy(async (token: string, done) => {
   try {
     const payload = jwt.verify(token, env.REFRESH_TOKEN_SECRET) as JwtPayload;
 
@@ -31,3 +33,20 @@ export const rtStrategy = new Strategy(async (token: string, done) => {
     });
   }
 });
+
+export const rtStrategy = (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate(strategy, { session: false }, (err, user) => {
+    if (err) {
+      res.status(401).json({ message: err.message });
+      return;
+    }
+
+    if (!user) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    req.user = user;
+    next();
+  })(req, res, next);
+};
