@@ -16,7 +16,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"const { accessToken, refreshToken } = pm.response.json();",
+									"",
+									"if(accessToken && refreshToken) {",
+									"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken)",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -34,12 +39,12 @@
 							"urlencoded": [
 								{
 									"key": "email",
-									"value": "admin@racetracker.com",
+									"value": "{{admin_email}}",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "racetracker",
+									"value": "{{admin_password}}",
 									"type": "text"
 								}
 							]
@@ -50,6 +55,23 @@
 				},
 				{
 					"name": "Sign Up",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const { accessToken, refreshToken } = pm.response.json();",
+									"",
+									"if(accessToken && refreshToken) {",
+									"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken)",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -61,17 +83,17 @@
 							"urlencoded": [
 								{
 									"key": "email",
-									"value": "admin@racetracker.com",
+									"value": "{{admin_email}}",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "racetracker",
+									"value": "{{admin_password}}",
 									"type": "text"
 								},
 								{
 									"key": "confirmPassword",
-									"value": "racetracker",
+									"value": "{{admin_password}}",
 									"type": "text"
 								}
 							]
@@ -79,8 +101,107 @@
 						"url": "{{API_URL}}/auth/sign-up"
 					},
 					"response": []
+				},
+				{
+					"name": "Me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{API_URL}}/auth/me"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNCIsImlhdCI6MTczNTEyNjg5MSwiZXhwIjoxNzM1NzMxNjkxfQ.pME7AldeNOwjzxxLkxy5Tbm9PkOGvbYVR0PgJGjLSoQ"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"url": "{{API_URL}}/auth/refresh-token"
+					},
+					"response": []
 				}
 			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{ACCESS_TOKEN}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"const apiUrl = pm.environment.get(\"API_URL\");",
+					"const accessToken = pm.environment.get(\"ACCESS_TOKEN\");",
+					"const refreshToken = pm.environment.get(\"REFRESH_TOKEN\");",
+					"",
+					"const sendRequest = (options, callback) => {",
+					"    pm.sendRequest(options, callback);",
+					"};",
+					"",
+					"const handleAuthMeResponse = (err, res) => {",
+					"    if (err) {",
+					"        console.error(\"Error during request to /auth/me:\", err);",
+					"        return;",
+					"    }",
+					"",
+					"    if (res.code === 401) {",
+					"        const refreshOptions = {",
+					"            url: `${apiUrl}/auth/refresh-token`,",
+					"            method: \"POST\",",
+					"            headers: {",
+					"                Authorization: `Bearer ${refreshToken}`,",
+					"            },",
+					"        };",
+					"",
+					"        sendRequest(refreshOptions, handleRefreshTokenResponse);",
+					"    } else {",
+					"        console.log(\"Response from /auth/me:\", res);",
+					"    }",
+					"};",
+					"",
+					"const handleRefreshTokenResponse = (err, res) => {",
+					"    if (err) {",
+					"        console.error(\"Error during refresh token request:\", err);",
+					"        return;",
+					"    }",
+					"",
+					"    console.log(\"refresh res\", res);",
+					"};",
+					"",
+					"const authMeOptions = {",
+					"    url: `${apiUrl}/auth/me`,",
+					"    method: \"GET\",",
+					"    headers: {",
+					"        Authorization: `Bearer ${accessToken}`,",
+					"    },",
+					"};",
+					"",
+					"sendRequest(authMeOptions, handleAuthMeResponse);",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
