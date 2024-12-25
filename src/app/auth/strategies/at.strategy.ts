@@ -34,13 +34,11 @@ const strategy = new Strategy(async (token: string, done) => {
 export const atStrategy = (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate(strategy, { session: false }, (err, user) => {
     if (err) {
-      console.log(err);
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
     if (!user) {
-      console.log(user);
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
