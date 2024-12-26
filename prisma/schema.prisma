@@ -19,9 +19,42 @@ model User {
   role Role @default(USER)
 
   refreshToken String?
+
+  Race Race[]  @relation("RaceParticipants")
+  createdRaces Race[] @relation("RaceCreator")
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model Race {
+  id          Int          @id @unique @default(autoincrement())
+  name        String
+  joinCode    String @unique
+  startDate   DateTime
+  joinUntil   DateTime
+  checkPoints CheckPoint[]
+  creator     User         @relation("RaceCreator", fields: [creatorId], references: [id])
+  creatorId   Int
+  participants User[]       @relation("RaceParticipants")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+}
+
+model CheckPoint {
+  id        Int    @id @unique @default(autoincrement())
+  name      String
+  latitude  Float
+  longitude Float
+
+  order    Int
+
+  raceId    Int
+  race      Race   @relation(fields: [raceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 }
