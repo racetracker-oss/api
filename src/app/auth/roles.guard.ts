@@ -7,13 +7,17 @@ export const rolesGuard = (actions: Permissions[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
     if (!user) {
-      return res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (user.role === "ADMIN") {
+      next();
     }
 
     if (rbac[user.role].some((permission) => actions.includes(permission))) {
-      return next();
+      next();
     }
 
-    return res.status(403).json({ message: "Forbidden" });
+    res.status(403).json({ message: "Forbidden" });
   };
 };
