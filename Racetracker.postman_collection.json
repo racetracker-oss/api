@@ -162,6 +162,61 @@
 					"response": []
 				},
 				{
+					"name": "Get single race",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/race/:code?includeParticipants=true",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"race",
+								":code"
+							],
+							"query": [
+								{
+									"key": "includeParticipants",
+									"value": "true"
+								}
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": "{{RACE_CODE}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get race participants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/race/:code/participants",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"race",
+								":code",
+								"participants"
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": "{{RACE_CODE}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create race",
 					"event": [
 						{
@@ -170,6 +225,7 @@
 								"exec": [
 									"if(pm.response.code === 201) {",
 									"    pm.environment.set(\"RACE_CODE\", pm.response.json().joinCode);",
+									"    pm.environment.set(\"RACE_ID\", pm.response.json().id);",
 									"}"
 								],
 								"type": "text/javascript",
@@ -232,29 +288,23 @@
 					"response": []
 				},
 				{
-					"name": "Get single race",
+					"name": "Delete race",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/race/:code?includeParticipants=true",
+							"raw": "{{API_URL}}/race/:id",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"race",
-								":code"
-							],
-							"query": [
-								{
-									"key": "includeParticipants",
-									"value": "true"
-								}
+								":id"
 							],
 							"variable": [
 								{
-									"key": "code",
-									"value": "{{RACE_CODE}}"
+									"key": "id",
+									"value": "{{RACE_ID}}"
 								}
 							]
 						}
@@ -262,23 +312,23 @@
 					"response": []
 				},
 				{
-					"name": "Get race participants",
+					"name": "Leave race",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/race/:code/participants",
+							"raw": "{{API_URL}}/race/:id/leave",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"race",
-								":code",
-								"participants"
+								":id",
+								"leave"
 							],
 							"variable": [
 								{
-									"key": "code",
+									"key": "id",
 									"value": "{{RACE_CODE}}"
 								}
 							]
