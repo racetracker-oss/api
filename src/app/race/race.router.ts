@@ -8,6 +8,7 @@ import {
   handleGetRaceParticipants,
   handleGetRaces,
   handleGetSingleRace,
+  handleRaceDelete,
   handleRaceLeave,
 } from "./race.controller";
 import { rolesGuard } from "../auth/roles.guard";
@@ -26,5 +27,11 @@ router.post(
 );
 router.post("/race/:code/enter", atStrategy, handleEnterRace);
 router.delete("/race/:code/leave", atStrategy, handleRaceLeave);
+router.delete(
+  "/race/:id",
+  atStrategy,
+  rolesGuard(["race:delete"]),
+  handleRaceDelete
+);
 
 export { router as raceRouter };
