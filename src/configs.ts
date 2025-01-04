@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import * as bodyparser from "body-parser";
 import morgan from "morgan";
-import { authErrorHandler } from "./app/auth/auth.middleware";
+import { appErrorHandler } from "./app/common";
 
 export function initConfig(app: Express): void {
   app.use(cors({ origin: "*" }));
@@ -11,5 +11,5 @@ export function initConfig(app: Express): void {
   app.use(bodyparser.urlencoded({ extended: true }));
   app.use(bodyparser.json());
   app.use(morgan(":method :url :response-time ms"));
-  app.use(authErrorHandler);
+  app.use(appErrorHandler);
 }

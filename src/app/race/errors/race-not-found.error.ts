@@ -1,7 +1,8 @@
-export class RaceNotFoundError extends Error {
-  public readonly status: number = 404;
+import { AppError } from "@/app/common";
+
+export class RaceNotFoundError extends AppError {
   constructor(public readonly message = "Race not found.") {
-    super(message);
+    super(message, 404);
     this.name = "RaceNotFoundError";
   }
 }
