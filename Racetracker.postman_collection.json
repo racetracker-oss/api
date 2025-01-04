@@ -10,6 +10,15 @@
 			"name": "Auth",
 			"item": [
 				{
+					"name": "Me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{API_URL}}/auth/me"
+					},
+					"response": []
+				},
+				{
 					"name": "Sign In",
 					"event": [
 						{
@@ -103,15 +112,6 @@
 					"response": []
 				},
 				{
-					"name": "Me",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": "{{API_URL}}/auth/me"
-					},
-					"response": []
-				},
-				{
 					"name": "Refresh token",
 					"request": {
 						"auth": {
@@ -123,6 +123,166 @@
 						"method": "POST",
 						"header": [],
 						"url": "{{API_URL}}/auth/refresh-token"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Races",
+			"item": [
+				{
+					"name": "Get races",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/race?orderBy=NAME_ASC",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"race"
+							],
+							"query": [
+								{
+									"key": "active",
+									"value": "ACTIVE",
+									"description": "it can be \"ACTIVE\", \"NOT_ACTIVE\". If its empty it includes all active and non-active races",
+									"disabled": true
+								},
+								{
+									"key": "orderBy",
+									"value": "NAME_ASC",
+									"description": "it can be     | \"DATE_ASC\"\n    | \"DATE_DESC\"\n    | \"PARTICIPANTS_COUNT_ASC\"\n    | \"PARTICIPANTS_COUNT_DESC\"\n    | \"NAME_ASC\"\n    | \"NAME_DESC\". \nCurrently supports one option. If its not set, default ordering applied"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create race",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if(pm.response.code === 201) {",
+									"    pm.environment.set(\"RACE_CODE\", pm.response.json().joinCode);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Test race",
+									"type": "text"
+								},
+								{
+									"key": "startDate",
+									"value": "2024-12-26",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "joinUntil",
+									"value": "2025-01-12",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": "{{API_URL}}/race"
+					},
+					"response": []
+				},
+				{
+					"name": "Enter race",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/race/:code/enter",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"race",
+								":code",
+								"enter"
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": "{{RACE_CODE}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get single race",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/race/:code?includeParticipants=true",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"race",
+								":code"
+							],
+							"query": [
+								{
+									"key": "includeParticipants",
+									"value": "true"
+								}
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": "{{RACE_CODE}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get race participants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/race/:code/participants",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"race",
+								":code",
+								"participants"
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": "{{RACE_CODE}}"
+								}
+							]
+						}
 					},
 					"response": []
 				}
@@ -151,7 +311,6 @@
 					"};",
 					"",
 					"const handleAuthMeResponse = (err, res) => {",
-					"    console.log(\"auth me response\", res);",
 					"    if (res.code === 401) {",
 					"        const refreshOptions = {",
 					"            url: `${apiUrl}/auth/refresh-token`,",
