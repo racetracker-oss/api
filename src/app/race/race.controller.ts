@@ -1,13 +1,15 @@
 import type { Request, Response } from "express";
 import type { CreateRace } from "./schemas/race.schema";
-import { createRace } from "./commands/create-race.command";
 import type { User } from "@prisma/client";
-import { enterRace } from "./commands/enter-race.command";
-import { getRaces } from "./commands/get-races.command";
-import { handleLeaveRace } from "./commands/leave-race.command";
-import { getRace } from "./commands/get-race.command";
-import { getRaceParticipants } from "./commands/get-race-participants.command";
-import { deleteRace } from "./commands/delete-race.command";
+import {
+  getRaces,
+  createRace,
+  deleteRace,
+  enterRace,
+  getRace,
+  getRaceParticipants,
+  handleLeaveRace,
+} from "./commands";
 
 export const handleGetRaces = async (req: Request, res: Response) => {
   const { query } = req;

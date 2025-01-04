@@ -2,11 +2,11 @@ import { prisma } from "@/database";
 import { RaceNotFoundError } from "../errors";
 import type { Prisma, Race } from "@prisma/client";
 
-export type GetRaceOptions = {
+type GetRaceOptions = {
   includeParticipants: boolean;
 };
 
-export const byCode = async (
+const byCode = async (
   code: string,
   filters?: GetRaceOptions
 ): Promise<Race> => {
@@ -30,7 +30,7 @@ export const byCode = async (
   return race;
 };
 
-export const byId = async (id: number): Promise<Race> => {
+const byId = async (id: number): Promise<Race> => {
   const race = await prisma.race.findUnique({
     where: {
       id,
