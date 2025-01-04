@@ -3,8 +3,10 @@ import type { CreateRace } from "./schemas/race.schema";
 import { createRace } from "./commands/create-race.command";
 import type { User } from "@prisma/client";
 import { enterRace } from "./commands/enter-race.command";
-import { RaceNotFoundError } from "./errors";
 import { getRaces } from "./commands/get-races.command";
+import { handleLeaveRace } from "./commands/leave-race.command";
+import { getRace } from "./commands/get-race.command";
+import { getRaceParticipants } from "./commands/get-race-participants.command";
 
 export const handleGetRaces = async (req: Request, res: Response) => {
   const { query } = req;
@@ -12,7 +14,46 @@ export const handleGetRaces = async (req: Request, res: Response) => {
     const result = await getRaces(query);
     res.json(result);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(error.status).json({ message: error.message });
+  }
+};
+
+export const handleGetSingleRace = async (
+  req: Request<
+    { code: string },
+    unknown,
+    unknown,
+    { includeParticipants: string }
+  >,
+  res: Response
+) => {
+  const { code } = req.params;
+  const { includeParticipants } = req.query;
+
+  const options: { includeParticipants: boolean } = {
+    includeParticipants:
+      includeParticipants === "true" || includeParticipants === "1",
+  };
+
+  try {
+    const result = await getRace.byCode(code, options);
+    res.json(result);
+  } catch (error) {
+    res.status(error.status).json({ message: error.message });
+  }
+};
+
+export const handleGetRaceParticipants = async (
+  req: Request<{ code: string }>,
+  res: Response
+) => {
+  const { code } = req.params;
+
+  try {
+    const result = await getRaceParticipants(code);
+    res.json(result);
+  } catch (error) {
+    res.status(error.status).json({ message: error.message });
   }
 };
 
@@ -24,9 +65,9 @@ export const handleCreateRace = async (
 
   try {
     const result = await createRace(user as unknown as User, body);
-    res.json(result);
+    res.status(201).json(result);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(error.status).json({ message: error.message });
   }
 };
 
@@ -40,10 +81,22 @@ export const handleEnterRace = async (
     // @ts-ignore
     await enterRace(req.user, code);
     res.json({ message: "Joined successfully." });
-  } catch (e) {
-    if (e instanceof RaceNotFoundError) {
-      res.status(e.status).json({ message: e.message });
-    }
-    res.status(500).json({ message: e.message });
+  } catch (error) {
+    res.status(error.status).json({ message: error.message });
+  }
+};
+
+export const handleRaceLeave = async (
+  req: Request<{ code: string }, unknown, unknown>,
+  res: Response
+) => {
+  const { code } = req.params;
+
+  try {
+    // @ts-ignore
+    await handleLeaveRace(req.user, code);
+    res.json({ message: "Left successfully." });
+  } catch (error) {
+    res.status(error.status).json({ message: error.message });
   }
 };
