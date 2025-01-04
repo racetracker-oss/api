@@ -14,16 +14,12 @@ export const signIn = async (
   const { body } = req;
   const user = await getUserByEmail(body.email);
   if (!user) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Invalid credentials. " });
+    return res.status(401).json({ message: "Invalid credentials. " });
   }
 
   const isPasswordCorrect = await argon2.verify(user.password, body.password);
   if (!isPasswordCorrect) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Invalid credentials. " });
+    return res.status(401).json({ message: "Invalid credentials. " });
   }
 
   const payload: JwtPayload = {
@@ -70,9 +66,7 @@ export const signUp = async (
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2002")
-        res
-          .status(400)
-          .json({ success: false, message: "User already exists." });
+        res.status(400).json({ message: "User already exists." });
     }
   }
 };
@@ -84,9 +78,7 @@ export const refreshToken = async (req: Request, res: Response) => {
   });
 
   if (!user) {
-    res
-      .status(401)
-      .json({ success: false, message: "Invalid refresh token. " });
+    res.status(401).json({ message: "Invalid refresh token. " });
     return;
   }
 

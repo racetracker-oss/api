@@ -28,7 +28,6 @@ const strategy = new Strategy(async (token: string, done) => {
 });
 
 export const rtStrategy = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.headers);
   passport.authenticate(strategy, { session: false }, (err, user) => {
     if (err) {
       res.status(401).json({ message: err.message });
