@@ -23,14 +23,14 @@ export const handleGetRaces = async (req: Request, res: Response) => {
 
 export const handleGetSingleRace = async (
   req: Request<
-    { code: string },
+    { id: string },
     unknown,
     unknown,
     { includeParticipants: string }
   >,
   res: Response
 ) => {
-  const { code } = req.params;
+  const { id } = req.params;
   const { includeParticipants } = req.query;
 
   const options: { includeParticipants: boolean } = {
@@ -39,7 +39,7 @@ export const handleGetSingleRace = async (
   };
 
   try {
-    const result = await getRace.byCode(code, options);
+    const result = await getRace.byId(+id, options);
     res.json(result);
   } catch (error) {
     res.status(error.status).json({ message: error.message });
@@ -47,13 +47,13 @@ export const handleGetSingleRace = async (
 };
 
 export const handleGetRaceParticipants = async (
-  req: Request<{ code: string }>,
+  req: Request<{ id: string }>,
   res: Response
 ) => {
-  const { code } = req.params;
+  const { id } = req.params;
 
   try {
-    const result = await getRaceParticipants(code);
+    const result = await getRaceParticipants(+id);
     res.json(result);
   } catch (error) {
     res.status(error.status).json({ message: error.message });

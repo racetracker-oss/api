@@ -16,8 +16,8 @@ import { rolesGuard } from "../auth/roles.guard";
 const router = Router();
 
 router.get("/race", handleGetRaces);
-router.get("/race/:code", handleGetSingleRace);
-router.get("/race/:code/participants", handleGetRaceParticipants);
+router.get("/race/:id", handleGetSingleRace);
+router.get("/race/:id/participants", handleGetRaceParticipants);
 router.post(
   "/race",
   atStrategy,

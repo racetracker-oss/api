@@ -1,10 +1,10 @@
 import { prisma } from "@/database";
 import { RaceNotFoundError } from "../errors";
 
-export const getRaceParticipants = async (code: string) => {
+export const getRaceParticipants = async (id: number) => {
   const result = await prisma.race.findUnique({
     where: {
-      joinCode: code,
+      id: id,
     },
     select: {
       participants: true,

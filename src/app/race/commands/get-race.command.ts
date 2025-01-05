@@ -30,15 +30,24 @@ const byCode = async (
   return race;
 };
 
-const byId = async (id: number): Promise<Race> => {
+const byId = async (id: number, filters?: GetRaceOptions): Promise<Race> => {
+  const include: Prisma.RaceInclude = {
+    participants: filters?.includeParticipants && {
+      select: {
+        id: true,
+        email: true,
+      },
+    },
+  };
+
   const race = await prisma.race.findUnique({
     where: {
       id,
     },
+    include,
   });
 
   if (!race) throw new RaceNotFoundError();
-
   return race;
 };
 
