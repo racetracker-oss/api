@@ -65,5 +65,5 @@ export const me = async (req: Request, res: Response) => {
     return;
   }
 
-  res.json({ user });
+  res.json(user);
 };
