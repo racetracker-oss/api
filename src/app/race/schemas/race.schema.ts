@@ -4,7 +4,7 @@ import { createCheckpointSchema } from "../checkpoints/schemas/checkpoint.schema
 
 export const createRaceSchema = z.object({
   name: z.string().min(2).max(255),
-  startDate: z.coerce.date().default(() => new Date()),
+  startDate: z.coerce.date().default(() => addDays(new Date(), 7)),
   joinUntil: z.coerce.date().default(() => addDays(new Date(), 7)),
   checkPoints: z.array(createCheckpointSchema).optional(),
 });
