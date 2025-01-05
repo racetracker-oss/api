@@ -1,13 +1,17 @@
 import { prisma } from "@/database";
 import { RaceNotFoundError } from "../errors";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import type { Prisma, User } from "@prisma/client";
 
-export const deleteRace = async (raceId: number) => {
+export const deleteRace = async (user: User, raceId: number) => {
+  const where: Prisma.RaceWhereUniqueInput = {
+    id: raceId,
+    ...(user.role === "ADMIN" ? {} : { creatorId: user.id }),
+  };
+
   try {
     const result = await prisma.race.delete({
-      where: {
-        id: raceId,
-      },
+      where,
     });
     return result;
   } catch (e) {

@@ -167,13 +167,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/race/:code?includeParticipants=true",
+							"raw": "{{API_URL}}/race/:raceId?includeParticipants=true",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"race",
-								":code"
+								":raceId"
 							],
 							"query": [
 								{
@@ -183,8 +183,8 @@
 							],
 							"variable": [
 								{
-									"key": "code",
-									"value": "{{RACE_CODE}}"
+									"key": "raceId",
+									"value": "{{RACE_ID}}"
 								}
 							]
 						}
@@ -197,19 +197,19 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/race/:code/participants",
+							"raw": "{{API_URL}}/race/:raceId/participants",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"race",
-								":code",
+								":raceId",
 								"participants"
 							],
 							"variable": [
 								{
-									"key": "code",
-									"value": "{{RACE_CODE}}"
+									"key": "raceId",
+									"value": "{{RACE_ID}}"
 								}
 							]
 						}
@@ -317,18 +317,18 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/race/:id/leave",
+							"raw": "{{API_URL}}/race/:code/leave",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"race",
-								":id",
+								":code",
 								"leave"
 							],
 							"variable": [
 								{
-									"key": "id",
+									"key": "code",
 									"value": "{{RACE_CODE}}"
 								}
 							]
