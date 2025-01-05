@@ -121,7 +121,8 @@ export const handleRaceDelete = async (
   }
 
   try {
-    await deleteRace(+id);
+    //@ts-ignore
+    await deleteRace(req.user, +id);
     res.json({ message: "Race successfully deleted." });
   } catch (error) {
     res.status(error.status).json({ message: error.message });
