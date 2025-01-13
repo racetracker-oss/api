@@ -3,7 +3,7 @@ import type { SignInSchema, SignUpSchema } from "./schemas";
 import { generateTokens } from "./commands/generate-token.command";
 import { getUserByEmail, getUserById } from "../user";
 import { createUser } from "../user/commands/create-user.command";
-import { updateRefreshToken, verifyPassword } from "./commands";
+import { logOut, updateRefreshToken, verifyPassword } from "./commands";
 
 export const signIn = async (
   req: Request<unknown, unknown, SignInSchema>,
@@ -66,4 +66,15 @@ export const me = async (req: Request, res: Response) => {
   }
 
   res.json(user);
+};
+
+export const handleLogout = async (req: Request, res: Response) => {
+  try {
+    //@ts-ignore
+    await logOut(req.user.id);
+
+    res.json({ success: true });
+  } catch (e) {
+    res.status(e.status).json({ message: e.message });
+  }
 };
