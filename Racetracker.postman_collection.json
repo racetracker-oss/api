@@ -125,6 +125,15 @@
 						"url": "{{API_URL}}/auth/refresh-token"
 					},
 					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "{{API_URL}}/auth/logout"
+					},
+					"response": []
 				}
 			]
 		},
@@ -137,7 +146,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/race?orderBy=NAME_ASC",
+							"raw": "{{API_URL}}/race?active=ACTIVE&orderBy=NAME_ASC",
 							"host": [
 								"{{API_URL}}"
 							],
@@ -148,8 +157,7 @@
 								{
 									"key": "active",
 									"value": "ACTIVE",
-									"description": "it can be \"ACTIVE\", \"NOT_ACTIVE\". If its empty it includes all active and non-active races",
-									"disabled": true
+									"description": "it can be \"ACTIVE\", \"NOT_ACTIVE\". If its empty it includes all active and non-active races"
 								},
 								{
 									"key": "orderBy",
@@ -167,19 +175,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/race/:raceId?includeParticipants=true",
+							"raw": "{{API_URL}}/race/:raceId",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"race",
 								":raceId"
-							],
-							"query": [
-								{
-									"key": "includeParticipants",
-									"value": "true"
-								}
 							],
 							"variable": [
 								{
@@ -189,7 +191,41 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "with participants",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/race/:raceId?includeParticipants=true",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"race",
+										":raceId"
+									],
+									"query": [
+										{
+											"key": "includeParticipants",
+											"value": "true"
+										}
+									],
+									"variable": [
+										{
+											"key": "raceId",
+											"value": "{{RACE_ID}}"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
 				},
 				{
 					"name": "Get race participants",
@@ -333,6 +369,305 @@
 								}
 							]
 						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Create user (ROLE: admin)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const { createdUserId } = pm.response.json();",
+											"",
+											"if(createdUserId) {",
+											"    pm.environment.set(\"USER_ID\", createdUserId);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "{{$randomEmail}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{$randomPassword}}",
+											"type": "text"
+										},
+										{
+											"key": "name",
+											"value": "{{$randomNamePrefix}} {{$randomFullName}}",
+											"description": "optional",
+											"type": "text"
+										},
+										{
+											"key": "role",
+											"value": "USER",
+											"type": "text"
+										}
+									]
+								},
+								"url": "{{API_URL}}/admin/user"
+							},
+							"response": [
+								{
+									"name": "Create admin user",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "email",
+													"value": "{{$randomEmail}}",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "{{$randomPassword}}",
+													"type": "text"
+												},
+												{
+													"key": "name",
+													"value": "{{$randomNamePrefix}} {{$randomFullName}}",
+													"description": "optional",
+													"type": "text"
+												},
+												{
+													"key": "role",
+													"value": "ADMIN",
+													"type": "text"
+												}
+											]
+										},
+										"url": "{{API_URL}}/admin/user"
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								},
+								{
+									"name": "Create simple user",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "email",
+													"value": "{{$randomEmail}}",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "{{$randomPassword}}",
+													"type": "text"
+												},
+												{
+													"key": "name",
+													"value": "{{$randomNamePrefix}} {{$randomFullName}}",
+													"description": "optional",
+													"type": "text",
+													"disabled": true
+												},
+												{
+													"key": "role",
+													"value": "USER",
+													"type": "text"
+												}
+											]
+										},
+										"url": "{{API_URL}}/admin/user"
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
+						},
+						{
+							"name": "Update user (ROLE: admin)",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "{{$randomEmail}}",
+											"description": "Optional",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{$randomPassword}}",
+											"description": "Optional",
+											"type": "text"
+										},
+										{
+											"key": "name",
+											"value": "{{$randomFullName}}",
+											"description": "Optional",
+											"type": "text"
+										},
+										{
+											"key": "role",
+											"value": "USER",
+											"description": "\"USER\" | \"ADMIN\"",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{API_URL}}/admin/user/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{USER_ID}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/admin/user/:id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"admin",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{USER_ID}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if(pm.response.code === 200) {",
+									"    pm.environment.set(\"USER_ID\", pm.response.json()[0].id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{API_URL}}/user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/user/:id",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"user",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{USER_ID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update logged user profile",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "admin@racetracker.com",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "{{$randomFullName}}",
+									"type": "text"
+								},
+								{
+									"key": "currentPassword",
+									"value": "{{admin_password}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{admin_password}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{API_URL}}/user"
 					},
 					"response": []
 				}

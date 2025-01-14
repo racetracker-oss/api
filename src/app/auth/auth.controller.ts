@@ -1,100 +1,60 @@
-import argon2 from "argon2";
-import type { JwtPayload } from "jsonwebtoken";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import type { Request, Response } from "express";
 import type { SignInSchema, SignUpSchema } from "./schemas";
-import { prisma } from "@/database";
 import { generateTokens } from "./commands/generate-token.command";
-import { getUserByEmail } from "../user";
+import { getUserByEmail, getUserById } from "../user";
+import { createUser } from "../user/commands/create-user.command";
+import { logOut, updateRefreshToken, verifyPassword } from "./commands";
 
 export const signIn = async (
   req: Request<unknown, unknown, SignInSchema>,
   res: Response
 ) => {
-  const { body } = req;
-  const user = await getUserByEmail(body.email);
-  if (!user) {
-    return res.status(401).json({ message: "Invalid credentials. " });
+  const { email } = req.body;
+  try {
+    const user = await getUserByEmail(email);
+
+    await verifyPassword(user.password, req.body.password);
+
+    const [accessToken, refreshToken] = generateTokens(user);
+
+    await updateRefreshToken(user, refreshToken);
+
+    res.json({ success: true, accessToken, refreshToken });
+  } catch (e) {
+    res.status(e.status || 500).json({ message: e.message });
   }
-
-  const isPasswordCorrect = await argon2.verify(user.password, body.password);
-  if (!isPasswordCorrect) {
-    return res.status(401).json({ message: "Invalid credentials. " });
-  }
-
-  const payload: JwtPayload = {
-    sub: user.id.toString(),
-  };
-
-  const [accessToken, refreshToken] = generateTokens(payload);
-
-  const hashedToken = await argon2.hash(refreshToken);
-
-  await prisma.user.update({
-    data: { refreshToken: hashedToken },
-    where: { id: user.id },
-  });
-
-  res.json({ success: true, accessToken, refreshToken });
 };
 
 export const signUp = async (
   req: Request<unknown, unknown, SignUpSchema>,
   res: Response
 ) => {
-  const { body } = req;
   try {
-    const hashedPassword = await argon2.hash(body.password);
+    const user = await createUser(req.body);
 
-    const user = await prisma.user.create({
-      data: { email: body.email, password: hashedPassword },
-    });
+    const [accessToken, refreshToken] = generateTokens(user);
 
-    const payload: JwtPayload = {
-      sub: user.id.toString(),
-    };
+    await updateRefreshToken(user, refreshToken);
 
-    const [accessToken, refreshToken] = generateTokens(payload);
-
-    const hashedToken = await argon2.hash(refreshToken);
-    await prisma.user.update({
-      data: { refreshToken: hashedToken },
-      where: { id: user.id },
-    });
-
-    res.json({ success: true, accessToken, refreshToken });
+    res.status(201).json({ success: true, accessToken, refreshToken });
   } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError) {
-      if (e.code === "P2002")
-        res.status(400).json({ message: "User already exists." });
-    }
+    res.status(e.status).json({ message: e.message });
   }
 };
 
 export const refreshToken = async (req: Request, res: Response) => {
-  const user = await prisma.user.findUnique({
-    //@ts-ignore - ok, we have typings for req.user, but when you try to compile it, it will throw an error. So, we need to ignore it.
-    where: { id: req.user.id },
-  });
+  try {
+    //@ts-ignore
+    const user = await getUserById(req.user.id);
 
-  if (!user) {
-    res.status(401).json({ message: "Invalid refresh token. " });
-    return;
+    const [accessToken, refreshToken] = generateTokens(user);
+
+    await updateRefreshToken(user, refreshToken);
+
+    res.json({ success: true, accessToken, refreshToken });
+  } catch (e) {
+    res.status(e.status).json({ message: e.message });
   }
-
-  const payload: JwtPayload = {
-    sub: user.id.toString(),
-  };
-
-  const [accessToken, refreshToken] = generateTokens(payload);
-  const hashedToken = await argon2.hash(refreshToken);
-
-  await prisma.user.update({
-    data: { refreshToken: hashedToken },
-    where: { id: user.id },
-  });
-
-  res.json({ success: true, accessToken, refreshToken });
 };
 
 export const me = async (req: Request, res: Response) => {
@@ -105,5 +65,16 @@ export const me = async (req: Request, res: Response) => {
     return;
   }
 
-  res.json({ user });
+  res.json(user);
+};
+
+export const handleLogout = async (req: Request, res: Response) => {
+  try {
+    //@ts-ignore
+    await logOut(req.user.id);
+
+    res.json({ success: true });
+  } catch (e) {
+    res.status(e.status).json({ message: e.message });
+  }
 };
