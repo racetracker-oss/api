@@ -38,7 +38,7 @@ export const signUp = async (
 
     res.status(201).json({ success: true, accessToken, refreshToken });
   } catch (e) {
-    res.status(e.status).json({ message: e.message });
+    res.status(e.status || 500).json({ message: e.message });
   }
 };
 
