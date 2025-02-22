@@ -1,18 +1,8 @@
 import { prisma } from "@/database";
-import type { Request, Response } from "express";
+import type { Request } from "express";
 
-interface HealthCheckResponse {
-  database: "OK" | "ERROR";
-  server: "OK" | "ERROR";
-}
-
-export const healthCheck = async (
-  _: Request,
-  res: Response<HealthCheckResponse>
-) => {
+export const healthCheck = async (_: Request, res) => {
   const database = await prisma.$queryRaw`SELECT 1`;
-  res.json({
-    database: database ? "OK" : "ERROR",
-    server: "OK",
-  });
+  if (!database) res.status(500).send("NOT OK");
+  res.send("OK");
 };
